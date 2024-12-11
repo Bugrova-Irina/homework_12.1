@@ -1,7 +1,10 @@
 import json
-from unittest.mock import patch, mock_open
+import unittest
+from unittest.mock import patch, mock_open, Mock
 
-from src.utils import get_transactions
+import pytest
+
+from src.utils import get_transactions, generate_transaction
 
 
 def test_get_transactions():
@@ -39,19 +42,32 @@ def test_get_empty_transactions():
 
 
 def test_get_bad_transactions():
-    """Тестирует возврат списка транзакций из json-файла, который не содержит список"""
-    mock_data = "bghfhgh"
+    """Тестирует возврат списка транзакций из некорректного json-файла"""
+    mock_data = "fdgfdg"
 
-    mock_file = json.dumps(mock_data)
-
-    with patch("builtins.open", mock_open(read_data=mock_file)):
+    with patch("builtins.open", mock_open(read_data=mock_data)):
         result = get_transactions("mock_path.json")
-        assert result == mock_data
+        assert result == []
 
 
-def test_generate_transactions():
+@patch('random.choice')
+def test_generate_transactions(mock_choice, transactions):
     """Тестирует генератор транзакций"""
-    mock_get = Mock(return_value={'id': 743278119, 'state': 'EXECUTED', 'date': '2018-10-15T08:05:34.061711', 'operationAmount': {'amount': '51203.12', 'currency': {'name': 'USD', 'code': 'USD'}}, 'description': 'Перевод с карты на карту', 'from': 'MasterCard 1435442169918409', 'to': 'Maestro 7452400219469235'})
-    transaction = mock_get
-    assert generate_transaction() == {'id': 743278119, 'state': 'EXECUTED', 'date': '2018-10-15T08:05:34.061711', 'operationAmount': {'amount': '51203.12', 'currency': {'name': 'USD', 'code': 'USD'}}, 'description': 'Перевод с карты на карту', 'from': 'MasterCard 1435442169918409', 'to': 'Maestro 7452400219469235'}
-    mock_get.assert_called_once_with()
+    mock_choice.side_effect = transactions
+
+    transaction_generator = generate_transaction(transactions)
+
+    transaction1 = next(transaction_generator)
+    transaction2 = next(transaction_generator)
+
+    assert transaction1 in transactions
+    assert transaction2 in transactions
+
+    assert mock_choice.call_count == 2
+
+
+def test_generate_no_transactions():
+    """тестирует генератор транзакций при их отсутствии"""
+    with pytest.raises(ValueError) as exc_info:
+        next(generate_transaction([]))
+    assert str(exc_info.value) == "Список транзакций пуст."

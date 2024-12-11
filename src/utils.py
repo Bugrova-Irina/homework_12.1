@@ -1,4 +1,3 @@
-import codecs
 import json
 from typing import Any
 import random
@@ -42,5 +41,3 @@ if __name__ == "__main__":
             print(transaction1)
         except StopIteration:
             print("Не удалось получить транзакции.")
-
-

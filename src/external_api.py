@@ -4,7 +4,7 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
-from utils import get_transactions, generate_transaction
+from src.utils import get_transactions, generate_transaction
 
 
 def get_amount(transaction: dict[str, Any]) -> float:
@@ -15,31 +15,39 @@ def get_amount(transaction: dict[str, Any]) -> float:
     if currency_transaction == "RUB":
         return amount_transaction
     else:
-        load_dotenv()
+        load_dotenv('.env')
         apikey = os.getenv("apikey")
 
         if not apikey:
             raise ValueError("API ключ не найден. Проверьте файл .env")
 
         print(f"apikey = {apikey}")
-        url = f"https://api.apilayer.com/currency_data/convert?to=RUB&from=USD&amount={amount_transaction}"
+        url = f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_transaction}&amount={amount_transaction}"
 
         headers = {
-            "Authorization": f"Bearer {apikey}",
-            # "apikey": f"{apikey}",
+            "apikey": apikey,
             "Content-Type": "application/json",
         }
 
         response = requests.get(url, headers=headers)
+
+        if response.status_code != 200:
+            raise ValueError(f"Ошибка API: {response.status_code}")
+
         status_code = response.status_code
         result = response.text
 
+
         print(response)
+        print(response.json())
         print(result)
         print(status_code)
 
         try:
             json_response = response.json()
+            if 'result' not in json_response:
+                raise ValueError(f"No data for amount {transaction}")
+
             print(json_response)
             return json_response.get('result', 0)
         except ValueError:
