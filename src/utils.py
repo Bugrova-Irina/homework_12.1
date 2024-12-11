@@ -1,12 +1,12 @@
 import json
-from typing import Any
 import random
+from typing import Any
 
 
 def get_transactions(json_path: str) -> list[dict[str, Any]]:
     """Выводит список словарей с данными о финансовых транзакциях"""
     try:
-        with open(json_path, 'r', encoding="utf-8") as json_file:
+        with open(json_path, "r", encoding="utf-8") as json_file:
             transactions = json.load(json_file)
 
             return transactions
@@ -23,8 +23,8 @@ def generate_transaction(transactions: list[dict[str, Any]]) -> list[dict[str, A
         try:
             transaction = random.choice(transactions)
             yield transaction
-        except IndexError as e:
-            return f'Некорректные исходные данные {e}'
+        except ValueError as e:
+            return f"Некорректные исходные данные {e}"
 
 
 if __name__ == "__main__":

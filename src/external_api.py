@@ -4,7 +4,7 @@ from typing import Any
 import requests
 from dotenv import load_dotenv
 
-from src.utils import get_transactions, generate_transaction
+from src.utils import generate_transaction, get_transactions
 
 
 def get_amount(transaction: dict[str, Any]) -> float:
@@ -15,7 +15,7 @@ def get_amount(transaction: dict[str, Any]) -> float:
     if currency_transaction == "RUB":
         return amount_transaction
     else:
-        load_dotenv('.env')
+        load_dotenv(".env")
         apikey = os.getenv("apikey")
 
         if not apikey:
@@ -37,7 +37,6 @@ def get_amount(transaction: dict[str, Any]) -> float:
         status_code = response.status_code
         result = response.text
 
-
         print(response)
         print(response.json())
         print(result)
@@ -45,11 +44,11 @@ def get_amount(transaction: dict[str, Any]) -> float:
 
         try:
             json_response = response.json()
-            if 'result' not in json_response:
+            if "result" not in json_response:
                 raise ValueError(f"No data for amount {transaction}")
 
             print(json_response)
-            return json_response.get('result', 0)
+            return json_response.get("result", 0)
         except ValueError:
             print("Ошибка при парсинге JSON ответа.")
             return 0.0

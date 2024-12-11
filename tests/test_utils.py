@@ -1,10 +1,10 @@
 import json
-import unittest
-from unittest.mock import patch, mock_open, Mock
+
+from unittest.mock import Mock, mock_open, patch
 
 import pytest
 
-from src.utils import get_transactions, generate_transaction
+from src.utils import generate_transaction, get_transactions
 
 
 def test_get_transactions():
@@ -50,7 +50,7 @@ def test_get_bad_transactions():
         assert result == []
 
 
-@patch('random.choice')
+@patch("random.choice")
 def test_generate_transactions(mock_choice, transactions):
     """Тестирует генератор транзакций"""
     mock_choice.side_effect = transactions
@@ -71,3 +71,14 @@ def test_generate_no_transactions():
     with pytest.raises(ValueError) as exc_info:
         next(generate_transaction([]))
     assert str(exc_info.value) == "Список транзакций пуст."
+
+
+# @patch("random.choice")
+# def test_generate_bad_transactions(mock_choice, transactions):
+#     """Тестирует генератор транзакций с некорректными входными данными"""
+#     mock_choice.side_effect = ValueError("Некорректные исходные данные {e}")
+#
+#     with pytest.raises(ValueError, match="Некорректные исходные данные {e}"):
+#         transaction_generator = generate_transaction([546546])
+#         next(transaction_generator)
+#         yield "Некорректные исходные данные {e}"

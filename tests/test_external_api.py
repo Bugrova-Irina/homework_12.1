@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from dotenv import load_dotenv
@@ -21,7 +21,7 @@ def test_get_amount_success(transaction_rub):
 def test_get_amount_usd(mock_get):
     """Тестирует конвертор суммы транзакции из USD в рубли"""
     load_dotenv()
-    apikey = os.getenv('apikey')
+    apikey = os.getenv("apikey")
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
         "success": True,
@@ -50,17 +50,15 @@ def test_get_amount_usd(mock_get):
     currency_transaction = transaction["operationAmount"]["currency"]["code"]
     amount_transaction = transaction["operationAmount"]["amount"]
 
-    expected_url = (
-        f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_transaction}&amount={amount_transaction}"
-    )
+    expected_url = f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_transaction}&amount={amount_transaction}"
 
     assert mock_get.call_count == 1
     mock_get.assert_called_once_with(
         expected_url,
-        headers = {
+        headers={
             "apikey": apikey,
             "Content-Type": "application/json",
-        }
+        },
     )
 
 
@@ -112,9 +110,7 @@ def test_get_amount_bad_status_code(mock_get):
 
     currency_transaction = transaction["operationAmount"]["currency"]["code"]
     amount_transaction = transaction["operationAmount"]["amount"]
-    expected_url = (
-        f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_transaction}&amount={amount_transaction}"
-    )
+    expected_url = f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from={currency_transaction}&amount={amount_transaction}"
 
     assert mock_get.call_count == 1
     mock_get.assert_called_once_with(
@@ -122,7 +118,7 @@ def test_get_amount_bad_status_code(mock_get):
         headers={
             "apikey": os.getenv("apikey"),
             "Content-Type": "application/json",
-        }
+        },
     )
 
 
